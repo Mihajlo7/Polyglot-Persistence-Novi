@@ -177,5 +177,10 @@ namespace HybridDataAccess.Implementation
         {
             throw new NotImplementedException();
         }
+
+        public Task<List<ProductModel>> GetAllProducts()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
