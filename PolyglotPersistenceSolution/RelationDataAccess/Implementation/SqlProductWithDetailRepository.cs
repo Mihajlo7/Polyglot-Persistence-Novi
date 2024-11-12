@@ -85,7 +85,14 @@ namespace RelationDataAccess.Implementation
 
         public Task<ProductModel> GetProductWithDetailByProductId(long productId)
         {
-            throw new NotImplementedException();
+            string query = ProductWithDetail.GetProductWithDetailById;
+
+            using var connection = new SqlConnection(_connectionString);
+            using var command = new SqlCommand(query,connection);
+            command.Parameters.AddWithValue("@ProductId", productId);
+
+            connection.Open();
+            return null;
         }
 
         public Task<int> InsertMany(List<ProductModel> product)

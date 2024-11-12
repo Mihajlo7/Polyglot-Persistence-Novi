@@ -20,12 +20,30 @@
 	    <AutoGen>True</AutoGen>
 	    <DependentUpon>ConsumerQueries.resx</DependentUpon>
 	  </Compile>
+	  <Compile Update="Resources\ProductWithCompanyQueries.Designer.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>ProductWithCompanyQueries.resx</DependentUpon>
+	  </Compile>
+	  <Compile Update="Resources\ProductWithDetail.Designer.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>ProductWithDetail.resx</DependentUpon>
+	  </Compile>
 	</ItemGroup>
 
 	<ItemGroup>
 	  <EmbeddedResource Update="Resources\ConsumerQueries.resx">
 	    <Generator>ResXFileCodeGenerator</Generator>
 	    <LastGenOutput>ConsumerQueries.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
+	  <EmbeddedResource Update="Resources\ProductWithCompanyQueries.resx">
+	    <Generator>ResXFileCodeGenerator</Generator>
+	    <LastGenOutput>ProductWithCompanyQueries.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
+	  <EmbeddedResource Update="Resources\ProductWithDetail.resx">
+	    <Generator>ResXFileCodeGenerator</Generator>
+	    <LastGenOutput>ProductWithDetail.Designer.cs</LastGenOutput>
 	  </EmbeddedResource>
 	</ItemGroup>
 
