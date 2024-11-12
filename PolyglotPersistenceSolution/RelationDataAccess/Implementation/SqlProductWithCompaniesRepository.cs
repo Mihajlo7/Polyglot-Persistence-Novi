@@ -1,7 +1,10 @@
 ﻿using Core.Models;
 using IDataAccess;
 using Microsoft.Data.SqlClient;
+using MongoDB.Driver;
+using MongoDB.Driver.Core.Configuration;
 using RelationDataAccess.HelperSqlData;
+using RelationDataAccess.Resources;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -22,49 +25,142 @@ namespace RelationDataAccess.Implementation
             _connectionString = $"Data Source=.;Initial Catalog={_database};Integrated Security=True;TrustServerCertificate=True;";
         }
 
-        public Task<List<ProductModel>> GetAllProductsWithCompaniesBySelect()
+        public async Task<List<ProductModel>> GetAllProductsWithCompaniesBySelect()
         {
-            throw new NotImplementedException();
+            string query = ProductWithCompanyQueries.GetProductsByJoinPlain;
+
+            using var connection = new SqlConnection( _connectionString );
+            using var command = new SqlCommand( query, connection );
+            command.CommandTimeout = 300;
+
+            connection.Open();
+            using var reader = await command.ExecuteReaderAsync();
+            var res = reader.GetProductsWithCompanyBadWay();
+
+            return res;
         }
 
-        public Task<List<ProductModel>> GetAllProductsWithCompaniesBySelectOptimised()
+        public async Task<List<ProductModel>> GetAllProductsWithCompaniesBySelectOptimised()
         {
-            throw new NotImplementedException();
+            string query = ProductWithCompanyQueries.GetProductsByJoinOptimised;
+
+            using var connection = new SqlConnection(_connectionString);
+            using var command = new SqlCommand(query, connection);
+            command.CommandTimeout = 300;
+
+            connection.Open();
+            using var reader = await command.ExecuteReaderAsync();
+            var res = reader.GetProductsWithCompany();
+
+            return res;
         }
 
-        public Task<List<ProductModel>> GetAllProductsWithCompaniesBySelectSubQuery()
+        public async Task<List<ProductModel>> GetAllProductsWithCompaniesBySelectSubQuery()
         {
-            throw new NotImplementedException();
+            string query = ProductWithCompanyQueries.GetProductsBySubQuery;
+
+            using var connection = new SqlConnection(_connectionString);
+            using var command = new SqlCommand(query, connection);
+            command.CommandTimeout = 300;
+
+            connection.Open();
+            using var reader = await command.ExecuteReaderAsync();
+            var res = reader.GetProductsWithCompany();
+
+            return res;
         }
 
-        public Task<List<ProductModel>> GetAllProductsWithCompaniesBySubQueryApply()
+        public async Task<List<ProductModel>> GetAllProductsWithCompaniesBySubQueryApply()
         {
-            throw new NotImplementedException();
+            string query = ProductWithCompanyQueries.GetProductsBySubQueryWithApply;
+
+            using var connection = new SqlConnection(_connectionString);
+            using var command = new SqlCommand(query, connection);
+            command.CommandTimeout = 300;
+
+            connection.Open();
+            using var reader = await command.ExecuteReaderAsync();
+            var res = reader.GetProductsWithCompany();
+
+            return res;
         }
 
-        public Task<List<ProductModel>> GetProductsWithCompaniesByName(string name)
+        public async Task<List<ProductModel>> GetProductsWithCompaniesByName(string name)
         {
-            throw new NotImplementedException();
+            string query = ProductWithCompanyQueries.GetProductsByName;
+
+            using var connection = new SqlConnection(_connectionString);
+            using var command = new SqlCommand(query, connection);
+            command.Parameters.AddWithValue("@Name", $"{name}%");
+
+            connection.Open();
+            using var reader = await command.ExecuteReaderAsync();
+            var res = reader.GetProductsWithCompany();
+
+            return res;
         }
 
-        public Task<List<ProductModel>> GetProductsWithCompaniesByNameAndDistributionCountryAndDistributionPrice(string productName, string distributionCountry, decimal distributionPrice)
+        public async Task<List<ProductModel>> GetProductsWithCompaniesByNameAndDistributionCountryAndDistributionPrice(string productName, string distributionCountry, decimal distributionPrice)
         {
-            throw new NotImplementedException();
+            string query = ProductWithCompanyQueries.GetProductsByNameAndDistributionCountryAndPrice;
+
+            using var connection = new SqlConnection(_connectionString);
+            using var command = new SqlCommand(query, connection);
+
+            command.Parameters.AddWithValue("@DistributeCountry", distributionCountry);
+            command.Parameters.AddWithValue("@ProductName", $"{productName}%");
+            command.Parameters.AddWithValue("@DistributePrice", distributionPrice);
+
+            connection.Open();
+            using var reader = await command.ExecuteReaderAsync();
+
+            var products = reader.GetProductsWithCompany();
+            return products;
         }
 
-        public Task<List<ProductModel>> GetProductsWithCompaniesByNameWithLike(string name)
+        public async Task<List<ProductModel>> GetProductsWithCompaniesByNameWithLike(string name)
         {
-            throw new NotImplementedException();
+            string query = ProductWithCompanyQueries.GetProductsByNameWithLike;
+
+            using var connection = new SqlConnection(_connectionString);
+            using var command = new SqlCommand(query, connection);
+            command.Parameters.AddWithValue("@Name", name);
+
+            connection.Open();
+            using var reader = await command.ExecuteReaderAsync();
+            var res = reader.GetProductsWithCompany();
+
+            return res;
         }
 
-        public Task<List<ProductModel>> GetProductsWithCompaniesByProduceCountryAndPrice(string produceCountry, decimal productPrice)
+        public async Task<List<ProductModel>> GetProductsWithCompaniesByProduceCountryAndPrice(string produceCountry, decimal productPrice)
         {
-            throw new NotImplementedException();
+            string query = ProductWithCompanyQueries.GetProductsByCountryAndPrice;
+
+            using var connection = new SqlConnection(_connectionString);
+            using var command = new SqlCommand(query, connection);
+
+            command.Parameters.AddWithValue("@ProduceCountry", produceCountry);
+            command.Parameters.AddWithValue("@ProductPrice", productPrice);
+
+            connection.Open();
+            using var reader = await command.ExecuteReaderAsync();
+            var products = reader.GetProductsWithCompany();
+            return products;
         }
 
-        public Task<ProductModel> GetProductWithCompaniesById(long productId)
+        public async Task<ProductModel> GetProductWithCompaniesById(long productId)
         {
-            throw new NotImplementedException();
+            string query = ProductWithCompanyQueries.GetProductById;
+
+            using var connection = new SqlConnection(_connectionString);
+            using var command = new SqlCommand(query,connection);
+
+            command.Parameters.AddWithValue("@ProductId", productId);
+            connection.Open();
+            using var reader = await command.ExecuteReaderAsync();
+            var products= reader.GetProductsWithCompany();
+            return products.First();
         }
 
         public async Task<int> InsertMany(List<ProductModel> products)
