@@ -12,5 +12,6 @@ namespace Core.Models
         public string Name { get; set; }
 
         public CategoryModel Category { get; set; }
+        public ICollection<ProductModel>? Products { get; set; }
     }
 }
