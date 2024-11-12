@@ -279,5 +279,136 @@ namespace RelationDataAccess.HelperSqlData
             }
             return products;
         }
+        public static List<ProductModel> GetProductWithDetailsBadWay(this SqlDataReader reader)
+        {
+            List<ProductModel> products = new();
+
+            while (reader.Read())
+            {
+                ProductModel product = new();
+                var productId = reader.GetInt64(0);
+                product.Id = productId;
+                product.Name = reader.GetString(1);
+                product.Price = reader.GetDecimal(2);
+
+                var productDetailId = reader.GetInt64(6);
+                var shortDescription = reader.GetString(8);
+                var imageUrl = reader.GetString(9);
+
+                if (!reader.IsDBNull(10))
+                {
+                    product.Details = new CarDetailsModel
+                    {
+                        Id = productDetailId,
+                        ProductId = productId,
+                        ShortDescription = shortDescription,
+                        ImageUrl = imageUrl,
+                        YearManufactured = reader.GetInt32(11),
+                        Model = reader.GetString(12),
+                        SerialNumber = reader.GetString(13),
+                        EngineDisplacement = reader.GetString(14),
+                        EnginePower = reader.GetString(15),
+                        LongDescription = reader.GetString(16),
+                    };
+                }
+                else if (!reader.IsDBNull(17))
+                {
+                    if (!reader.IsDBNull(22))
+                    {
+                        product.Details = new MobileDetailsModel
+                        {
+                            Id = productDetailId,
+                            ProductId = productId,
+                            ShortDescription = shortDescription,
+                            ImageUrl = imageUrl,
+                            YearManufactured = reader.GetInt32(18),
+                            SerialNumber = reader.GetString(19),
+                            Weight = reader.GetString(20),
+                            Storage = reader.GetString(21),
+                            ScreenDiagonal = reader.GetString(23),
+                            OperatingSystem = reader.GetString(24),
+                            Color = reader.GetString(25),
+                        };
+                    }
+                    else if (!reader.IsDBNull(26))
+                    {
+
+                    }
+
+                }
+                else if (!reader.IsDBNull(30))
+                {
+
+                }
+                products.Add(product);
+            }
+            return products;
+        }
+
+        public static List<ProductModel> GetProductsWithDetails(this SqlDataReader reader)
+        {
+            List<ProductModel> products = new();
+
+            while (reader.Read())
+            {
+                ProductModel product = new();
+                var productId = reader.GetInt64("ProductId");
+                product.Id = productId;
+                product.Name = reader.GetString("ProductName");
+                product.Price = reader.GetDecimal("Price");
+
+                var productDetailId = reader.GetInt64("ProductDetailId");
+                var shortDescription = reader.GetString("ShortDescription");
+                var imageUrl = reader.GetString("ImageUrl");
+
+                if (!reader.IsDBNull("CarYearManufactured"))
+                {
+                    product.Details = new CarDetailsModel
+                    {
+                        Id = productDetailId,
+                        ProductId = productId,
+                        ShortDescription = shortDescription,
+                        ImageUrl = imageUrl,
+                        YearManufactured = reader.GetInt32("CarYearManufactured"),
+                        Model = reader.GetString("CarModel"),
+                        SerialNumber = reader.GetString("CarSerialNumber"),
+                        EngineDisplacement = reader.GetString("CarEngineDisplacement"),
+                        EnginePower = reader.GetString("CarEnginePower"),
+                        LongDescription = reader.GetString("CarLongDescription"),
+                    };
+                }
+                else if (!reader.IsDBNull("DeviceYearManufactured"))
+                {
+                    if (!reader.IsDBNull("MobileScreenDiagonal"))
+                    {
+                        product.Details = new MobileDetailsModel
+                        {
+                            Id = productDetailId,
+                            ProductId = productId,
+                            ShortDescription = shortDescription,
+                            ImageUrl = imageUrl,
+                            YearManufactured = reader.GetInt32("DeviceYearManufactured"),
+                            SerialNumber = reader.GetString("DeviceSerialNumber"),
+                            Weight = reader.GetString("DeviceWeight"),
+                            Storage = reader.GetString("DeviceStorage"),
+                            ScreenDiagonal = reader.GetString("MobileScreenDiagonal"),
+                            OperatingSystem = reader.GetString("MobileOperatingSystem"),
+                            Color = reader.GetString("MobileColor"),
+                        };
+                    }
+                    else if (!reader.IsDBNull("LaptopProductDetailId"))
+                    {
+
+                    }
+
+                }
+                else if (!reader.IsDBNull("MovieYearRelease"))
+                {
+
+                }
+                products.Add(product);
+            }
+            return products;
+        }
     }
 }
