@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Reflection.Metadata;
 using System.Text;
@@ -91,19 +92,60 @@ namespace HybridDataAccess.Implementation
             return res;
         }
 
-        public Task<ProductModel> GetProductById(long id)
+        public async Task<ProductModel> GetProductById(long id)
         {
-            throw new NotImplementedException();
+            string query = "SELECT product.id Id,product.name Name,product.price Price, s.id SubCategoryId, s.name SubCategoryName \r\nFROM SubCategories s\r\nCROSS APPLY OPENJSON(products)\r\nWITH (\r\n\tid BIGINT '$.id',\r\n\tname NVARCHAR(30) '$.name',\r\n\tprice DECIMAL(5,2) '$.price'\r\n\t)AS product\r\nWHERE product.id=@ProductId;\r\n";
+            using var connection = new SqlConnection(_connectionString);
+            using var command = new SqlCommand(query, connection);
+
+            command.Parameters.AddWithValue("@ProductId", id);
+
+            connection.Open();
+            using var reader = await command.ExecuteReaderAsync();
+            List<ProductModel> products = new List<ProductModel>();
+            while (reader.Read())
+            {
+                ProductModel product = new ProductModel();
+                product.Id = reader.GetInt64("Id");
+                product.Name = reader.GetString("Name");
+                product.Price = reader.GetDecimal("Price");
+                product.SubCategory = new SubCategoryModel() { Id = reader.GetInt64("SubCategoryId"), Name = reader.GetString("SubCategoryName") };
+
+                products.Add(product);
+            }
+
+            return products.First();
         }
 
-        public Task<List<ProductModel>> GetProductsBySubCategoryId(long subCategoryId)
+        public async Task<List<ProductModel>> GetProductsBySubCategoryId(long subCategoryId)
         {
-            throw new NotImplementedException();
+            string query = "SELECT products\r\nFROM SubCategories\r\nWHERE id=@SubCategoryId;\r\n";
+            using var connection = new SqlConnection(_connectionString);
+            using var command = new SqlCommand(query,connection);
+
+            command.Parameters.AddWithValue("@SubCategoryId",subCategoryId);
+            connection.Open();
+            using var reader = await command.ExecuteReaderAsync();
+            var products = JsonSerializer.Deserialize<List<ProductModel>>(reader.GetString("products"));
+
+            return products;
         }
 
-        public Task<List<ProductModel>> GetProductsBySubCategoryName(string subCategoryName)
+        public async Task<List<ProductModel>> GetProductsBySubCategoryName(string subCategoryName)
         {
-            throw new NotImplementedException();
+            string query = "SELECT products\r\nFROM SubCategories\r\nWHERE name=@SubCategoryName;\r\n";
+            using var connection = new SqlConnection(_connectionString);
+            using var command = new SqlCommand(query, connection);
+
+            command.Parameters.AddWithValue("@SubCategoryName",subCategoryName);
+
+            connection.Open();
+
+            using var reader = await command.ExecuteReaderAsync();
+            var products = JsonSerializer.Deserialize<List<ProductModel>>(reader.GetString("products"));
+
+            return products;
+
         }
 
         public async Task<int> InsertMany(List<ProductModel> products)
@@ -178,9 +220,27 @@ namespace HybridDataAccess.Implementation
             throw new NotImplementedException();
         }
 
-        public Task<List<ProductModel>> GetAllProducts()
+        public async Task<List<ProductModel>> GetAllProducts()
         {
-            throw new NotImplementedException();
-        }
+            string query = "SELECT product.id Id,product.name Name,product.price Price, s.id SubCategoryId, s.name SubCategoryName \r\nFROM SubCategories s\r\nCROSS APPLY OPENJSON(products)\r\nWITH (\r\n\tid BIGINT '$.id',\r\n\tname NVARCHAR(30) '$.name',\r\n\tprice DECIMAL(5,2) '$.price'\r\n\t)AS product;";
+            using var connection = new SqlConnection(_connectionString);
+            using var command = new SqlCommand(query,connection);
+
+            command.CommandTimeout = 1000;
+            connection.Open();
+            using var reader = await command.ExecuteReaderAsync();
+            List<ProductModel> products = new List<ProductModel>();
+            while (reader.Read())
+            {
+                ProductModel product = new ProductModel();
+                product.Id = reader.GetInt64("Id");
+                product.Name = reader.GetString("Name");
+                product.Price = reader.GetDecimal("Price");
+                product.SubCategory = new SubCategoryModel() { Id= reader.GetInt64("SubCategoryId"),Name=reader.GetString("SubCategoryName")};
+                
+                products.Add(product);
+            }
+            return products;
+        } 
     }
 }

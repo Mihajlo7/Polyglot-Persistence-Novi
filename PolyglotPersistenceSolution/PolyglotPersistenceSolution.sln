@@ -19,7 +19,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IDataAccess", "IDataAccess\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RelationDataAccess", "RelationDataAccess\RelationDataAccess.csproj", "{E246A005-AC77-4E4C-BDD0-58AA5BD5BDFE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HybridDataAccess", "HybridDataAccess\HybridDataAccess.csproj", "{093A3AFA-CB81-4AED-9873-19114C0C8CDF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HybridDataAccess", "HybridDataAccess\HybridDataAccess.csproj", "{093A3AFA-CB81-4AED-9873-19114C0C8CDF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
