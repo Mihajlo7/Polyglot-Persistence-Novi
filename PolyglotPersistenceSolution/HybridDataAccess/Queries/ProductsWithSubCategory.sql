@@ -7,7 +7,7 @@ WITH (
 	id BIGINT '$.id',
 	name NVARCHAR(30) '$.name',
 	price DECIMAL(5,2) '$.price'
-	)AS product
+	)AS product;
 
 -- Get product by Id --
 SELECT product.id Id,product.name Name,product.price Price, s.id SubCategoryId, s.name SubCategoryName 
@@ -29,3 +29,11 @@ WHERE id=@SubCategoryId;
 SELECT products
 FROM SubCategories
 WHERE name=@SubCategoryName;
+
+-- Update price by ProductId --
+WITH cte AS(
+	SELECT *
+	FROM SubCategories CROSS APPLY OPENJSON(products)
+)
+UPDATE cte
+SET products = JSON_MODIFY(products,'$['+cte.[key]+'].Price',@Price)
