@@ -83,7 +83,7 @@ namespace RelationDataAccess.Implementation
             return products;
         }
 
-        public Task<ProductModel> GetProductWithDetailByProductId(long productId)
+        public async Task<ProductModel> GetProductWithDetailByProductId(long productId)
         {
             string query = ProductWithDetail.GetProductWithDetailById;
 
@@ -92,12 +92,30 @@ namespace RelationDataAccess.Implementation
             command.Parameters.AddWithValue("@ProductId", productId);
 
             connection.Open();
-            return null;
+
+            using var reader = await command.ExecuteReaderAsync();
+            var result = reader.GetProductsWithDetails();
+            return result.First();
+
         }
 
-        public Task<int> InsertMany(List<ProductModel> product)
+        public async Task<int> InsertMany(List<ProductModel> products)
         {
-            throw new NotImplementedException();
+            string query = "CreateProductWithDetail";
+            using var connection = new SqlConnection(_connectionString);
+            using var command = new SqlCommand(query, connection);
+
+            int count = 0;
+
+            connection.Open();
+
+            foreach (var product in products)
+            {
+                command.CreateProductDetailCommand(product);
+                await command.ExecuteNonQueryAsync();
+                count++;
+            }
+            return count;
         }
 
         public Task<int> InsertManyBulk(List<ProductModel> products)
@@ -105,24 +123,55 @@ namespace RelationDataAccess.Implementation
             throw new NotImplementedException();
         }
 
-        public Task InsertOne(ProductModel product)
+        public async Task InsertOne(ProductModel product)
         {
-            throw new NotImplementedException();
+            string query = "CreateProductWithDetail";
+            using var connection = new SqlConnection(_connectionString);
+            using var command = new SqlCommand(query, connection);
+
+            command.CreateProductDetailCommand(product);
+            connection.Open();
+            await command.ExecuteNonQueryAsync();
         }
 
-        public Task UpdateLongDescriptionByProductId(long productId)
+        public async Task UpdateLongDescriptionByProductId(long productId)
         {
-            throw new NotImplementedException();
+            string query = "UPDATE Cars SET longDescription=@LongDescription WHERE productDetailId=(SELECT productDetailId FROM ProductDetails WHERE productId=@ProductId);";
+            
+            using var connection = new SqlConnection(_connectionString);
+            using var command= new SqlCommand(query, connection);
+            command.Parameters.AddWithValue("@ProductId",productId);
+            command.Parameters.AddWithValue("@LongDescription",Guid.NewGuid().ToString());
+
+            connection.Open();
+
+            await command.ExecuteNonQueryAsync();
         }
 
-        public Task UpdatePriceByYearManifactured(int yearManifactured)
+        public async Task UpdatePriceByYearManifactured(int yearManifactured, decimal price)
         {
-            throw new NotImplementedException();
+            string query = "UPDATE ProductsHeader SET price=@Price " +
+                "WHERE productId = IN(SELECT productId FROM ProductDetails WHERE productDetailId=(SELECT productDetailId FROM Cars WHERE yearManifactured=@YearManifactured))";
+            using var connection = new SqlConnection(_connectionString);
+            using var command = new SqlCommand(query,connection);
+
+            command.Parameters.AddWithValue("@YearManufactured",yearManifactured);
+            command.Parameters.AddWithValue("@Price", price);
+            connection.Open();
+            await command.ExecuteNonQueryAsync();
         }
 
-        public Task UpdateStorageByProductId(long productId)
+        public async Task UpdateStorageByProductId(long productId, int storage)
         {
-            throw new NotImplementedException();
+            string query = "UPDATE Devices SET storage=@Storage WHERE productDetailId = (SELECT productDetailId FROM ProductDetails WHERE productId=@ProductId)";
+            using var connection = new SqlConnection(_connectionString);
+            using var command = new SqlCommand(query, connection);
+
+            command.Parameters.AddWithValue("@Storage",$"{storage} gb");
+            command.Parameters.AddWithValue("@ProductId",productId);
+
+            connection.Open();
+            await command.ExecuteNonQueryAsync();
         }
     }
 }

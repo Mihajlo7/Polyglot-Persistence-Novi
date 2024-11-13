@@ -20,8 +20,8 @@ namespace IDataAccess
         public Task<ProductModel> GetProductWithDetailByProductId(long productId);
         public Task<List<ProductModel>> GetProductsWithDetailByProductName(string productName);
 
-        public Task UpdatePriceByYearManifactured(int yearManifactured);
-        public Task UpdateStorageByProductId(long productId);
+        public Task UpdatePriceByYearManifactured(int yearManifactured,decimal price);
+        public Task UpdateStorageByProductId(long productId,int storage);
         public Task UpdateLongDescriptionByProductId(long productId);
     }
 }

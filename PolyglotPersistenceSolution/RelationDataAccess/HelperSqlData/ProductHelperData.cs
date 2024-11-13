@@ -410,5 +410,41 @@ namespace RelationDataAccess.HelperSqlData
             }
             return products;
         }
+
+
+        public static SqlCommand CreateProductDetailCommand(this SqlCommand command,ProductModel product)
+        {
+            command.Parameters.Clear();
+            command.Parameters.AddWithValue("@ProductId",product.Id);
+            
+            if(product.Details is CarDetailsModel car)
+            {
+                command.Parameters.AddWithValue("@ProductDetailId",car.Id);
+                command.Parameters.AddWithValue("@ProductType","Car");
+                command.Parameters.AddWithValue("@ShortDescription",car.ShortDescription);
+                command.Parameters.AddWithValue("@ImageUrl",car.ImageUrl);
+                command.Parameters.AddWithValue("@YearManufactured",car.YearManufactured);
+                command.Parameters.AddWithValue("@CarModel", car.Model);
+                command.Parameters.AddWithValue("@SerialNumber", car.SerialNumber);
+                command.Parameters.AddWithValue("@EngineDisplacement",car.EngineDisplacement);
+                command.Parameters.AddWithValue("@EnginePower", car.EnginePower);
+                command.Parameters.AddWithValue("@LongDescription",car.LongDescription);
+            }
+            else if (product.Details is MobileDetailsModel mobile)
+            {
+                command.Parameters.AddWithValue("@ProductDetailId", mobile.Id);
+                command.Parameters.AddWithValue("@ProductType", "Mobile");
+                command.Parameters.AddWithValue("@ShortDescription", mobile.ShortDescription);
+                command.Parameters.AddWithValue("@ImageUrl", mobile.ImageUrl);
+                command.Parameters.AddWithValue("@YearManufactured", mobile.YearManufactured);
+                command.Parameters.AddWithValue("@SerialNumber", mobile.SerialNumber);
+                command.Parameters.AddWithValue("@Weight", mobile.Weight);
+                command.Parameters.AddWithValue("@Storage", mobile.Storage);
+                command.Parameters.AddWithValue("@ScreenDiagonal", mobile.ScreenDiagonal);
+                command.Parameters.AddWithValue("@OperatingSystem", mobile.OperatingSystem);
+                command.Parameters.AddWithValue("@Color", mobile.Color);
+            }
+            return command;
+        }
     }
 }

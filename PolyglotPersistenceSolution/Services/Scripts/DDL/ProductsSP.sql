@@ -1,4 +1,5 @@
 ﻿
+
 CREATE OR ALTER PROCEDURE  CreateProduct
     @ProductId BIGINT,
     @ProductDetailId BIGINT,
