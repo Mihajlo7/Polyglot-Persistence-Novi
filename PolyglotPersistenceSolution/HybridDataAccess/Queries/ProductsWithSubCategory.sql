@@ -37,3 +37,5 @@ WITH cte AS(
 )
 UPDATE cte
 SET products = JSON_MODIFY(products,'$['+cte.[key]+'].Price',@Price)
+
+-- Update price by SubCategoryId
